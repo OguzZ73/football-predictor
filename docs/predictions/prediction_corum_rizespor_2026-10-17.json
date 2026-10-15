@@ -1,0 +1,82 @@
+{
+  "match": "Çorum (home) vs Çaykur Rizespor, Süper Lig 2026-27 matchday 8",
+  "kickoff": "2026-10-17 or 2026-10-18 (fixture file lists Sun Oct 18)",
+  "prediction_written_at": "2026-10-16T00:02:45+03:00",
+  "result_seen_before_writing": false,
+  "data_cutoff": "2026-09-07 (league files); missing matchdays 5-7",
+  "primary_model": "league_T1",
+  "league_T1": {
+    "params": {
+      "xi": 0.003,
+      "goal_weight": 0.75,
+      "use_values": true,
+      "l2": 5.0
+    },
+    "exp_goals_Corum": 1.825,
+    "exp_goals_Rizespor": 1.377,
+    "p_Corum_win": 0.472,
+    "p_draw": 0.2455,
+    "p_Rizespor_win": 0.2825,
+    "over_2_5": 0.6202,
+    "btts": 0.6355,
+    "top_scores": [
+      [
+        "1-1",
+        0.1109
+      ],
+      [
+        "2-1",
+        0.0934
+      ],
+      [
+        "1-2",
+        0.0704
+      ],
+      [
+        "2-0",
+        0.0678
+      ],
+      [
+        "1-0",
+        0.0658
+      ]
+    ]
+  },
+  "cross_league": {
+    "params": {
+      "xi": 0.0005,
+      "l2_team": 10.0,
+      "l2_league": 0.1
+    },
+    "exp_goals_Corum": 1.833,
+    "exp_goals_Rizespor": 1.361,
+    "p_Corum_win": 0.4821,
+    "p_draw": 0.2356,
+    "p_Rizespor_win": 0.2823,
+    "over_2_5": 0.6187,
+    "btts": 0.6285,
+    "top_scores": [
+      [
+        "1-1",
+        0.1062
+      ],
+      [
+        "2-1",
+        0.0938
+      ],
+      [
+        "1-0",
+        0.0714
+      ],
+      [
+        "1-2",
+        0.0697
+      ],
+      [
+        "2-0",
+        0.0689
+      ]
+    ]
+  },
+  "notes": "Çorum: 4 matches in data, no squad value (promoted)."
+}
