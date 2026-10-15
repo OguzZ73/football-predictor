@@ -367,8 +367,12 @@ Tahminler maç sonucu görülmeden [`docs/predictions/`](docs/predictions/) klas
 | Ligler arası model | **62.1%** | 19.8% | 18.1% |
 
 - **Tahmin edilenler:** beklenen gol 2.31 - 1.19. En olası skorlar 2-1 (9.6%), 1-1 (8.7%), 2-0 (8.1%).
-- **Sonuç:** henüz işlenmedi.
+- **Sonuç: Hoffenheim 2 - 3 Beşiktaş** (kullanıcının bildirdiği skor). Puanlama [`prediction_hoffenheim_besiktas_2026-10-15_scored.json`](docs/predictions/prediction_hoffenheim_besiktas_2026-10-15_scored.json) dosyasında.
+- **Kazanan:** model yanıldı. Beşiktaş galibiyetine yalnızca %18.1 vermişti. Bu maçtaki log-loss 1.707; 959 maçlık test ortalaması 0.947'ydi.
+- **Gol sayısı:** model gollü bir maç bekliyordu ve bunda haklı çıktı. 2.5 üst olasılığı %67.7 ve karşılıklı gol olasılığı %62.8'di; maçta 5 gol oldu ve iki takım da attı. 2-3 skorunun olasılığı %2.3'tü.
 - **Kaydın özeti:** `88b950898c5ee310c0509243c2c4be50fbd6ae6e2eb31d25ba9af05164007641`.
+
+**İki maçın özeti:** bir maçta favori doğru bilindi (Trabzonspor), birinde yanlış (Beşiktaş). Ortalama log-loss 1.21, test ortalamasından (0.947) kötü. %18 olasılık verilen bir sonuç kabaca beş maçtan birinde gerçekleşir; iki maç, modelin iyi ya da kötü olduğu hakkında anlamlı bir şey söylemez. Bu tür kayıtlar ancak onlarca maç biriktikçe anlam kazanır.
 
 Bir tahmin şöyle puanlanır (sonuç ev sahibinin golüyle başlar):
 

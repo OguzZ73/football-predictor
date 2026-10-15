@@ -1,0 +1,19 @@
+{
+  "prediction_file": "prediction_hoffenheim_besiktas_2026-10-15.json",
+  "prediction_sha256": "88b950898c5ee310c0509243c2c4be50fbd6ae6e2eb31d25ba9af05164007641",
+  "result": "2-3",
+  "scores": [
+    {
+      "model": "hierarchical",
+      "p_actual_outcome": 0.1815,
+      "log_loss": 1.7064996252772315,
+      "rps": 0.527543305,
+      "brier": 1.09425102,
+      "most_likely_outcome_correct": false,
+      "exact_score_in_top5": false,
+      "p_exact_score": null,
+      "brier_over_2_5": 0.10439361000000004,
+      "brier_btts": 0.13816089000000004
+    }
+  ]
+}
