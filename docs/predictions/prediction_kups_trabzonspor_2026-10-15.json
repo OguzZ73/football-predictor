@@ -1,0 +1,90 @@
+{
+  "match": "KuPS (home) vs Trabzonspor, UEFA Conference League league phase MD1",
+  "kickoff": "2026-10-15 19:45 Europe/Istanbul",
+  "prediction_written_at": "2026-10-15T19:46:20+03:00",
+  "result_seen_before_writing": false,
+  "data_cutoff": "2026-09-20",
+  "model": "CrossLeagueModel",
+  "params": {
+    "xi": 0.0005,
+    "l2_team": 10.0,
+    "l2_league": 0.1
+  },
+  "selected_on": "walk-forward log-loss, UEFA matches 2024-25",
+  "team_info": {
+    "KuPS": {
+      "league": "OTHER",
+      "matches_in_data": 36,
+      "world_rank": 553,
+      "strength": -0.371
+    },
+    "Trabzonspor": {
+      "league": "TR1",
+      "matches_in_data": 205,
+      "world_rank": 183,
+      "strength": 0.333
+    }
+  },
+  "hierarchical": {
+    "exp_goals_KuPS": 1.001,
+    "exp_goals_Trabzonspor": 1.537,
+    "p_KuPS_win": 0.2419,
+    "p_draw": 0.2653,
+    "p_Trabzonspor_win": 0.4928,
+    "over_2_5": 0.4658,
+    "btts": 0.5009,
+    "top_scores": [
+      [
+        "1-1",
+        0.1261
+      ],
+      [
+        "0-1",
+        0.117
+      ],
+      [
+        "1-2",
+        0.0935
+      ],
+      [
+        "0-2",
+        0.0934
+      ],
+      [
+        "0-0",
+        0.0836
+      ]
+    ]
+  },
+  "pooled_baseline": {
+    "exp_goals_KuPS": 1.185,
+    "exp_goals_Trabzonspor": 1.349,
+    "p_KuPS_win": 0.323,
+    "p_draw": 0.2762,
+    "p_Trabzonspor_win": 0.4008,
+    "over_2_5": 0.4647,
+    "btts": 0.5186,
+    "top_scores": [
+      [
+        "1-1",
+        0.1315
+      ],
+      [
+        "0-1",
+        0.1024
+      ],
+      [
+        "1-0",
+        0.0894
+      ],
+      [
+        "1-2",
+        0.0856
+      ],
+      [
+        "0-0",
+        0.084
+      ]
+    ]
+  }
+}

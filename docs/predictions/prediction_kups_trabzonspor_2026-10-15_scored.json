@@ -1,0 +1,31 @@
+{
+  "prediction_file": "prediction_kups_trabzonspor_2026-10-15.json",
+  "prediction_sha256": "00c2a5a4d8bd4fe2aa293eba97b21a9af9ab5ad83c48f0c1227c55474d8e50b4",
+  "result": "2-4",
+  "scores": [
+    {
+      "model": "hierarchical",
+      "p_actual_outcome": 0.4928,
+      "log_loss": 0.707651866762827,
+      "rps": 0.157883725,
+      "brier": 0.38615154,
+      "most_likely_outcome_correct": true,
+      "exact_score_in_top5": false,
+      "p_exact_score": null,
+      "brier_over_2_5": 0.28536964000000004,
+      "brier_btts": 0.24910080999999998
+    },
+    {
+      "model": "pooled_baseline",
+      "p_actual_outcome": 0.4008,
+      "log_loss": 0.9142927292114821,
+      "rps": 0.23168481999999999,
+      "brier": 0.53965608,
+      "most_likely_outcome_correct": true,
+      "exact_score_in_top5": false,
+      "p_exact_score": null,
+      "brier_over_2_5": 0.28654609,
+      "brier_btts": 0.23174596000000006
+    }
+  ]
+}

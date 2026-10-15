@@ -1,0 +1,59 @@
+{
+  "match": "TSG Hoffenheim (home) vs Beşiktaş, UEFA Europa League league phase",
+  "kickoff": "2026-10-15 21:00 or 22:00 Europe/Istanbul (sources differ)",
+  "prediction_written_at": "2026-10-15T20:13:22+03:00",
+  "result_seen_before_writing": false,
+  "data_cutoff": "2026-09-20",
+  "model": "CrossLeagueModel",
+  "params": {
+    "xi": 0.0005,
+    "l2_team": 10.0,
+    "l2_league": 0.1
+  },
+  "selected_on": "walk-forward log-loss, UEFA matches 2024-25",
+  "team_info": {
+    "Hoffenheim": {
+      "league": "L1",
+      "matches_in_data": 178,
+      "world_rank": 76,
+      "strength": 0.727
+    },
+    "Besiktas": {
+      "league": "TR1",
+      "matches_in_data": 218,
+      "world_rank": 179,
+      "strength": 0.336
+    }
+  },
+  "hierarchical": {
+    "exp_goals_Hoffenheim": 2.307,
+    "exp_goals_Besiktas": 1.186,
+    "p_Hoffenheim_win": 0.6206,
+    "p_draw": 0.1979,
+    "p_Besiktas_win": 0.1815,
+    "over_2_5": 0.6769,
+    "btts": 0.6283,
+    "top_scores": [
+      [
+        "2-1",
+        0.0962
+      ],
+      [
+        "1-1",
+        0.0866
+      ],
+      [
+        "2-0",
+        0.0812
+      ],
+      [
+        "3-1",
+        0.074
+      ],
+      [
+        "1-0",
+        0.0672
+      ]
+    ]
+  }
+}
