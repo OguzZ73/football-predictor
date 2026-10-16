@@ -384,6 +384,22 @@ Tek bir maç modeli doğrulamaz ya da çürütmez; değerlendirme için yukarıd
 
 ![KuPS - Trabzonspor skor olasılıkları](docs/img/heatmap_kups_trabzonspor.png)
 
+## Maç Masası: tarayıcıda çalışan arayüz
+
+[`docs/app/index.html`](docs/app/index.html), eğitilmiş modelleri içine gömülü taşıyan tek dosyalık bir sayfadır. Sunucu gerekmez; dosyayı indirip tarayıcıda açmak yeterli. Hesaplar tarayıcıda, Python modeliyle birebir aynı formüllerle yapılır (testlerde Node ile karşılaştırılıyor).
+
+- **Maç seçimi:** Süper Lig veya Premier Lig maçı, ya da ligler arası modelle herhangi iki kulüp (Avrupa maçları).
+- **Tarafsız saha:** işaretlenirse iç saha avantajı kaldırılır.
+- **Eksik oyuncular:** her eksik oyuncunun piyasa değerini girersin; Süper Lig modeli, veriden öğrendiği kadro değeri etkisiyle takımın gücünü düşürür. Premier Lig ve ligler arası modelde kadro değeri doğrulamada fayda göstermediği için bu giriş sonucu değiştirmez.
+- **Senin düzeltmelerin:** hakem, teknik direktör ya da motivasyon gibi modelin bilmediği etkiler için hücum ve savunmaya ±%30 düzeltme. Bunlar senin yargındır ve isabetleri test edilmedi; sayfa modelin saf tahminini ve senin ayarlı tahminini yan yana gösterir.
+- **Kayıt:** girdiler ve sonuçlar maç öncesi kaydedilmek üzere JSON olarak kopyalanabilir.
+
+Modeller yeniden eğitildikten sonra sayfayı güncellemek için:
+
+```bash
+football-predictor build-app --out docs/app/index.html
+```
+
 ## Modeli güncel tutmak: sonuçları elle girmek
 
 İndirilen kaynaklar birkaç hafta ila birkaç ay geriden gelir; 2026-27 Avrupa maçları hiç yoktur. Biten bir maçı kendiniz girebilirsiniz:
@@ -423,9 +439,10 @@ football-predictor/
 │   ├── simulate.py   # Monte Carlo sezon simülasyonu
 │   ├── multileague.py # ligler arası hiyerarşik model (31 lig + UEFA kupaları)
 │   ├── values.py     # kadro piyasa değeri anlık görüntüleri (Transfermarkt oyuncu değerleri)
+│   ├── app.py, app_core.js, app_template.html  # tarayıcı arayüzü (build-app)
 │   ├── plots.py      # ısı haritası, kalibrasyon, sıra olasılıkları (PNG)
 │   └── cli.py        # argparse CLI
-├── tests/            # pytest (52 test)
+├── tests/            # pytest (57 test)
 ├── notebooks/01_eda_and_results.ipynb
 ├── scripts/reproduce.sh
 └── docs/img/         # README görselleri

@@ -29,6 +29,7 @@ football-predictor world-evaluate --season 2526 | tee outputs/world_evaluate.txt
 football-predictor world-predict "KuPS" "Trabzonspor" --as-of 2026-10-15 | tee outputs/world_predict_kups_trabzonspor.txt
 football-predictor simulate-season --league E0 --season 2526 --as-of 2026-01-01 --n 10000 \
   | tee outputs/simulate_E0_2526_asof.txt
+football-predictor build-app --out docs/app/index.html
 cp outputs/calibration_T1.png outputs/calibration_E0.png outputs/heatmap_galatasaray_fenerbahce.png \
    outputs/positions_E0_2526.png outputs/world_league_strength.png docs/img/
 jupyter nbconvert --to notebook --execute --inplace notebooks/01_eda_and_results.ipynb

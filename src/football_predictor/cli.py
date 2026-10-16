@@ -454,6 +454,15 @@ def cmd_list_results(args) -> None:
     print(df.assign(Date=df["Date"].dt.strftime("%Y-%m-%d")).to_string(index=False))
 
 
+def cmd_build_app(args) -> None:
+    from .app import write_app
+    try:
+        out = write_app(args.out, args.data_dir, args.models_dir, standalone=not args.fragment)
+    except FileNotFoundError as exc:
+        raise SystemExit(str(exc))
+    print(f"Wrote {out} ({out.stat().st_size / 1024:.0f} KB). Open it in a browser.")
+
+
 # ------------------------------------------------------------------------ main
 def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(prog="football-predictor", description=(
@@ -520,6 +529,12 @@ def build_parser() -> argparse.ArgumentParser:
     we = sub.add_parser("world-evaluate", help="walk-forward test on one season of UEFA matches")
     we.add_argument("--season", default="2526")
     we.set_defaults(func=cmd_world_evaluate)
+
+    ba = sub.add_parser("build-app", help="write the interactive web page with the trained models")
+    ba.add_argument("--out", default="docs/app/index.html")
+    ba.add_argument("--fragment", action="store_true",
+                    help="omit <html>/<head>/<body> (for hosts that add their own skeleton)")
+    ba.set_defaults(func=cmd_build_app)
 
     sp = sub.add_parser("score-prediction", help="score a recorded prediction once the result is known")
     sp.add_argument("file", help="JSON written before the match (e.g. outputs/prediction_*.json)")

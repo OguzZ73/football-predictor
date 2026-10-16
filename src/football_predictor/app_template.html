@@ -1,0 +1,431 @@
+<title>Maç Masası</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Source+Sans+3:wght@400;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: control desk on the left, scoreboard and outcome sheet on the right; one column on phones. */
+:root {
+  --bg: #eef2ee; --surface: #ffffff; --ink: #14201a; --muted: #56675d; --line: #d5ded7;
+  --accent: #1d6b47; --accent-soft: #e1efe6;
+  --c-home: #12946a; --c-draw: #d9622f; --c-away: #2a6fc4;
+  --display: "Barlow Condensed", "Arial Narrow", Arial, sans-serif;
+  --body: "Source Sans 3", "Segoe UI", Helvetica, Arial, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0d1411; --surface: #141e19; --ink: #e6eee8; --muted: #9db0a5; --line: #26352d;
+  --accent: #5cc493; --accent-soft: #1b2e24;
+  --c-home: #2bb585; --c-draw: #e57a48; --c-away: #5b97e6; color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --bg: #0d1411; --surface: #141e19; --ink: #e6eee8; --muted: #9db0a5; --line: #26352d;
+  --accent: #5cc493; --accent-soft: #1b2e24;
+  --c-home: #2bb585; --c-draw: #e57a48; --c-away: #5b97e6; color-scheme: dark; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.5 var(--body);
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.wrap { max-width: 1180px; margin: 0 auto; padding-block: 24px 48px; display: grid; gap: 20px; }
+header { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 12px; }
+h1 { font: 700 2.4rem/1 var(--display); letter-spacing: .02em; margin: 0; text-transform: uppercase; }
+.sub { color: var(--muted); margin: 4px 0 0; max-width: 62ch; text-wrap: pretty; }
+.tabs { display: inline-flex; border: 1px solid var(--line); border-radius: 999px; padding: 3px; background: var(--surface); }
+.tabs button { border: 0; background: none; color: var(--muted); font: 600 .9rem var(--body); padding: 6px 14px; border-radius: 999px; cursor: pointer; }
+.tabs button[aria-pressed="true"] { background: var(--accent); color: var(--surface); }
+.grid { display: grid; grid-template-columns: minmax(0, 400px) minmax(0, 1fr); gap: 20px; align-items: start; }
+@media (max-width: 860px) { .grid { grid-template-columns: minmax(0, 1fr); } }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 16px; display: grid; gap: 12px; min-width: 0; }
+.panel h2 { font: 700 1.05rem/1.2 var(--display); text-transform: uppercase; letter-spacing: .06em; margin: 0; color: var(--accent); }
+.controls { display: grid; gap: 14px; }
+label { font-size: .85rem; color: var(--muted); display: grid; gap: 4px; }
+select, input[type="text"], input[type="number"] { font: 1rem var(--body); color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 6px; padding: 7px 9px; width: 100%; min-width: 0; }
+select:focus-visible, input:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.check { display: flex; align-items: center; gap: 8px; color: var(--ink); font-size: .95rem; }
+.hint { font-size: .82rem; color: var(--muted); margin: 0; }
+.tag { display: inline-block; font: 600 .72rem var(--body); letter-spacing: .05em; text-transform: uppercase; padding: 2px 8px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); }
+.tag.warn { background: color-mix(in srgb, var(--c-draw) 16%, transparent); color: var(--c-draw); }
+.team-block { display: grid; gap: 8px; padding-top: 8px; border-top: 1px dashed var(--line); }
+.team-block:first-of-type { border-top: 0; padding-top: 0; }
+.team-name { font: 700 1.05rem var(--display); letter-spacing: .03em; text-transform: uppercase; }
+.players { display: grid; gap: 6px; }
+.player { display: grid; grid-template-columns: minmax(0, 1fr) 92px 30px; gap: 6px; align-items: center; }
+.icon-btn { border: 1px solid var(--line); background: var(--bg); color: var(--muted); border-radius: 6px; height: 34px; cursor: pointer; font-size: 1rem; }
+.add-btn { justify-self: start; border: 1px dashed var(--line); background: none; color: var(--accent); font: 600 .85rem var(--body); padding: 5px 10px; border-radius: 6px; cursor: pointer; }
+.slider { display: grid; grid-template-columns: minmax(0, 1fr) 56px; gap: 8px; align-items: center; font-size: .9rem; }
+.slider input { width: 100%; accent-color: var(--accent); grid-column: 1 / -1; }
+.slider output { font: 500 .9rem var(--mono); text-align: right; font-variant-numeric: tabular-nums; }
+.scoreboard { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: 12px; text-align: center; }
+.sb-team { font: 700 clamp(1.3rem, 3vw, 1.9rem)/1.05 var(--display); text-transform: uppercase; letter-spacing: .02em; overflow-wrap: anywhere; }
+.sb-xg { font: 500 clamp(1.8rem, 5vw, 2.8rem)/1 var(--mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.sb-cap { font-size: .78rem; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; }
+.bars { display: grid; gap: 10px; }
+.bar-row { display: grid; grid-template-columns: 112px minmax(0, 1fr); gap: 10px; align-items: center; }
+.bar-label { font-size: .85rem; color: var(--muted); }
+.bar { display: flex; height: 30px; border-radius: 6px; overflow: hidden; gap: 2px; background: var(--line); }
+.bar span { display: flex; align-items: center; justify-content: center; color: #fff; font: 500 .82rem var(--mono); min-width: 0; overflow: hidden; white-space: nowrap; transition: flex-basis .35s ease; }
+.bar .h { background: var(--c-home); } .bar .d { background: var(--c-draw); } .bar .a { background: var(--c-away); }
+.legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: .82rem; color: var(--muted); }
+.legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 5px; vertical-align: -1px; }
+.two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; }
+@media (max-width: 560px) { .two { grid-template-columns: minmax(0, 1fr); } .bar-row { grid-template-columns: 84px minmax(0, 1fr); } }
+table { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; }
+.tops td { padding: 5px 4px; border-bottom: 1px solid var(--line); font-size: .95rem; }
+.tops td:first-child { font: 500 1rem var(--mono); }
+.tops td:last-child { text-align: right; font-family: var(--mono); }
+.dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; }
+.grid-wrap { overflow-x: auto; }
+.heat { font: .78rem var(--mono); }
+.heat th { color: var(--muted); font-weight: 500; padding: 3px; }
+.heat td { text-align: center; padding: 6px 2px; border: 2px solid var(--surface); border-radius: 4px; color: var(--ink); }
+.markets { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; }
+.mk { background: var(--bg); border-radius: 8px; padding: 10px 12px; }
+.mk b { display: block; font: 500 1.35rem var(--mono); font-variant-numeric: tabular-nums; }
+.mk span { font-size: .8rem; color: var(--muted); }
+.delta-up { color: var(--c-home); } .delta-down { color: var(--c-draw); }
+.notes { font-size: .85rem; color: var(--muted); display: grid; gap: 6px; }
+.notes p { margin: 0; }
+.copy { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.copy button { border: 0; background: var(--accent); color: var(--surface); font: 600 .9rem var(--body); padding: 8px 14px; border-radius: 6px; cursor: pointer; }
+textarea { width: 100%; min-height: 120px; font: .78rem var(--mono); background: var(--bg); color: var(--ink); border: 1px solid var(--line); border-radius: 6px; padding: 8px; }
+@media (prefers-reduced-motion: reduce) { .bar span { transition: none; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <div>
+      <h1>Maç Masası</h1>
+      <p class="sub">Dixon-Coles modelinin skor olasılıkları. Maç öncesi bildiklerini gir: eksik oyuncular, tarafsız saha ve kendi düzeltmelerin. Modelin saf tahmini ile senin ayarlı tahminin yan yana görünür.</p>
+    </div>
+    <div class="tabs" role="group" aria-label="Model">
+      <button id="tab-league" aria-pressed="true">Lig maçı</button>
+      <button id="tab-world" aria-pressed="false">Avrupa · ligler arası</button>
+    </div>
+  </header>
+
+  <div class="grid">
+    <div class="controls">
+      <section class="panel">
+        <h2>Maç</h2>
+        <label id="league-wrap">Lig
+          <select id="league"></select>
+        </label>
+        <div class="row2">
+          <label>Ev sahibi <select id="home"></select></label>
+          <label>Deplasman <select id="away"></select></label>
+        </div>
+        <label id="venue-wrap" hidden>Maçın türü
+          <select id="venue">
+            <option value="UEFA">UEFA kupası (Avrupa iç saha avantajı)</option>
+            <option value="LEAGUE">Ev sahibinin lig maçı</option>
+          </select>
+        </label>
+        <label class="check"><input type="checkbox" id="neutral"> Tarafsız saha (iç saha avantajı yok)</label>
+        <p class="hint" id="data-note"></p>
+      </section>
+
+      <section class="panel">
+        <h2>Eksik oyuncular</h2>
+        <p class="hint" id="missing-note"></p>
+        <div class="team-block">
+          <div class="team-name" id="home-label"></div>
+          <label>Kadro değeri (milyon €) <input type="number" id="home-squad" min="0" step="0.1" inputmode="decimal"></label>
+          <div class="players" id="home-players"></div>
+          <button class="add-btn" id="home-add" type="button">+ Oyuncu ekle</button>
+        </div>
+        <div class="team-block">
+          <div class="team-name" id="away-label"></div>
+          <label>Kadro değeri (milyon €) <input type="number" id="away-squad" min="0" step="0.1" inputmode="decimal"></label>
+          <div class="players" id="away-players"></div>
+          <button class="add-btn" id="away-add" type="button">+ Oyuncu ekle</button>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Senin düzeltmelerin</h2>
+        <p class="hint">Hakem, teknik direktör değişikliği, motivasyon gibi modelin bilmediği etkiler için. Model bu etkileri veriden öğrenmedi; buradaki değerler tamamen senin yargın ve isabeti test edilmedi.</p>
+        <div class="slider"><label for="adj-home-att" id="lab-home-att">Ev sahibi hücum</label><output id="out-home-att">0%</output><input type="range" id="adj-home-att" min="-30" max="30" step="1" value="0"></div>
+        <div class="slider"><label for="adj-home-def" id="lab-home-def">Ev sahibinin yediği gol</label><output id="out-home-def">0%</output><input type="range" id="adj-home-def" min="-30" max="30" step="1" value="0"></div>
+        <div class="slider"><label for="adj-away-att" id="lab-away-att">Deplasman hücum</label><output id="out-away-att">0%</output><input type="range" id="adj-away-att" min="-30" max="30" step="1" value="0"></div>
+        <div class="slider"><label for="adj-away-def" id="lab-away-def">Deplasmanın yediği gol</label><output id="out-away-def">0%</output><input type="range" id="adj-away-def" min="-30" max="30" step="1" value="0"></div>
+        <label>Hakem <input type="text" id="note-ref" placeholder="Ör. kartı bol bir hakem"></label>
+        <div class="row2">
+          <label>Ev sahibi teknik direktör <input type="text" id="note-coach-home"></label>
+          <label>Deplasman teknik direktör <input type="text" id="note-coach-away"></label>
+        </div>
+        <p class="hint">Hakem ve teknik direktör notları kayda girer ama sonucu değiştirmez. Etkisini düşünüyorsan yukarıdaki kaydırıcılarla yansıt.</p>
+      </section>
+    </div>
+
+    <div class="controls">
+      <section class="panel">
+        <div class="scoreboard">
+          <div><div class="sb-team" id="sb-home"></div><div class="sb-cap">ev sahibi</div></div>
+          <div><div class="sb-xg" id="sb-xg"></div><div class="sb-cap">beklenen gol (λ – μ)</div></div>
+          <div><div class="sb-team" id="sb-away"></div><div class="sb-cap">deplasman</div></div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Maç sonucu</h2>
+        <div class="bars">
+          <div class="bar-row"><span class="bar-label">Model (saf)</span><div class="bar" id="bar-base"></div></div>
+          <div class="bar-row"><span class="bar-label">Senin ayarınla</span><div class="bar" id="bar-adj"></div></div>
+        </div>
+        <div class="legend" id="legend"></div>
+        <p class="hint" id="adj-summary"></p>
+      </section>
+
+      <div class="two">
+        <section class="panel">
+          <h2>En olası skorlar</h2>
+          <table class="tops"><tbody id="tops"></tbody></table>
+        </section>
+        <section class="panel">
+          <h2>Diğer</h2>
+          <div class="markets" id="markets"></div>
+        </section>
+      </div>
+
+      <section class="panel">
+        <h2>Skor olasılıkları (%)</h2>
+        <p class="hint">Satırlar ev sahibinin, sütunlar deplasmanın golü. Senin ayarlarınla.</p>
+        <div class="grid-wrap"><table class="heat" id="heat"></table></div>
+      </section>
+
+      <section class="panel">
+        <h2>Tahmini kaydet</h2>
+        <p class="hint">Maçtan önce kaydı kopyala ve sakla; maç bitince <code>score-prediction</code> komutuyla puanlayabilirsin.</p>
+        <div class="copy"><button type="button" id="copy">Kaydı kopyala</button><span class="hint" id="copy-status" aria-live="polite"></span></div>
+        <textarea id="record" readonly hidden aria-label="Tahmin kaydı"></textarea>
+      </section>
+
+      <section class="panel notes">
+        <h2>Bu tahmin neye dayanıyor</h2>
+        <p id="model-note"></p>
+        <p>Model yalnızca geçmiş skorları, isabetli şutları ve kadro değerlerini görür. Sakatlık, hakem ve motivasyon bilgisini sen girersin. 2025-26 testinde Süper Lig ve Premier Lig'de bahis piyasası bu modelden daha isabetliydi. Eğitim amaçlıdır, bahis tavsiyesi değildir.</p>
+      </section>
+    </div>
+  </div>
+</div>
+
+<script>
+/*__CORE__*/
+</script>
+<script>
+const DATA = /*__DATA__*/null;
+const $ = id => document.getElementById(id);
+const pct = v => (100 * v).toFixed(1) + "%";
+let mode = "league";
+const missing = { home: [], away: [] };
+
+function leagueModel() { return DATA.leagues[$("league").value]; }
+
+function teamName(side) {
+  const v = $(side).value;
+  return mode === "world" ? DATA.world.teams[v].name : v;
+}
+
+function fillLeagueOptions() {
+  $("league").innerHTML = Object.entries(DATA.leagues)
+    .map(([k, L]) => `<option value="${k}">${L.label}</option>`).join("");
+}
+
+function fillTeams(keepHome, keepAway) {
+  let opts;
+  if (mode === "league") {
+    const L = leagueModel();
+    opts = L.current.map(t => `<option value="${t}">${t}</option>`).join("");
+  } else {
+    const W = DATA.world, groups = {};
+    Object.entries(W.teams).forEach(([id, t]) => (groups[t.league] ||= []).push([id, t.name]));
+    opts = Object.keys(groups).sort((a, b) => (W.leagues[a]?.name || a).localeCompare(W.leagues[b]?.name || b, "tr"))
+      .map(l => `<optgroup label="${W.leagues[l]?.name || l}">` + groups[l].sort((a, b) => a[1].localeCompare(b[1], "tr"))
+        .map(([id, n]) => `<option value="${id}">${n}</option>`).join("") + "</optgroup>").join("");
+  }
+  $("home").innerHTML = opts; $("away").innerHTML = opts;
+  if (keepHome) $("home").value = keepHome;
+  if (keepAway) $("away").value = keepAway;
+  if ($("home").value === $("away").value) $("away").selectedIndex = Math.min(1, $("away").options.length - 1);
+}
+
+function findWorldId(name) {
+  return Object.keys(DATA.world.teams).find(id => DATA.world.teams[id].name === name);
+}
+
+function syncSquads() {
+  ["home", "away"].forEach(side => {
+    const t = mode === "league" ? leagueModel().teams[$(side).value] : null;
+    $(side + "-squad").value = t && t.squad_m ? t.squad_m : "";
+    $(side + "-label").textContent = teamName(side);
+  });
+  missing.home = []; missing.away = [];
+  renderPlayers("home"); renderPlayers("away");
+}
+
+function renderPlayers(side) {
+  $(side + "-players").innerHTML = missing[side].map((p, i) => `
+    <div class="player">
+      <input type="text" aria-label="Oyuncu adı" data-side="${side}" data-i="${i}" data-k="name" value="${p.name.replace(/"/g, "&quot;")}" placeholder="Oyuncu">
+      <input type="number" aria-label="Piyasa değeri (milyon €)" data-side="${side}" data-i="${i}" data-k="value" value="${p.value}" min="0" step="0.1" inputmode="decimal" placeholder="M€">
+      <button class="icon-btn" type="button" aria-label="Oyuncuyu kaldır" data-del="${side}" data-i="${i}">×</button>
+    </div>`).join("");
+}
+
+function sumMissing(side) { return missing[side].reduce((s, p) => s + (parseFloat(p.value) || 0), 0); }
+
+function adjustments() {
+  return { homeAtt: +$("adj-home-att").value, homeDef: +$("adj-home-def").value,
+           awayAtt: +$("adj-away-att").value, awayDef: +$("adj-away-def").value };
+}
+
+function compute() {
+  const neutral = $("neutral").checked;
+  let base, adj;
+  if (mode === "league") {
+    const L = leagueModel(), h = $("home").value, a = $("away").value;
+    base = leagueRates(L, h, a, { neutral });
+    adj = leagueRates(L, h, a, { neutral,
+      homeSquad: parseFloat($("home-squad").value), homeMissing: sumMissing("home"),
+      awaySquad: parseFloat($("away-squad").value), awayMissing: sumMissing("away") });
+  } else {
+    const opts = { neutral, venue: $("venue").value };
+    base = worldRates(DATA.world, $("home").value, $("away").value, opts);
+    adj = { ...base };
+  }
+  adj = applyAdjust(adj, adjustments());
+  return { base, adj, mb: scoreMatrix(base.lam, base.mu, base.rho), ma: scoreMatrix(adj.lam, adj.mu, adj.rho) };
+}
+
+function barHTML(s) {
+  const seg = (cls, v) => `<span class="${cls}" style="flex-basis:${(100 * v).toFixed(2)}%">${v >= 0.07 ? pct(v) : ""}</span>`;
+  return seg("h", s.home) + seg("d", s.draw) + seg("a", s.away);
+}
+
+function heatColor(p, max) {
+  const t = Math.min(1, p / max);
+  return `color-mix(in srgb, var(--accent) ${Math.round(8 + 72 * t)}%, var(--surface))`;
+}
+
+function render() {
+  const r = compute(), sb = summarize(r.mb), sa = summarize(r.ma);
+  const hn = teamName("home"), an = teamName("away");
+  $("sb-home").textContent = hn; $("sb-away").textContent = an;
+  $("sb-xg").textContent = `${r.adj.lam.toFixed(2)} – ${r.adj.mu.toFixed(2)}`;
+  $("bar-base").innerHTML = barHTML(sb); $("bar-adj").innerHTML = barHTML(sa);
+  $("bar-base").setAttribute("aria-label", `Model: ${hn} ${pct(sb.home)}, beraberlik ${pct(sb.draw)}, ${an} ${pct(sb.away)}`);
+  $("bar-adj").setAttribute("aria-label", `Ayarlı: ${hn} ${pct(sa.home)}, beraberlik ${pct(sa.draw)}, ${an} ${pct(sa.away)}`);
+  $("legend").innerHTML = `<span><i style="background:var(--c-home)"></i>${hn} ${pct(sa.home)}</span>
+    <span><i style="background:var(--c-draw)"></i>Beraberlik ${pct(sa.draw)}</span>
+    <span><i style="background:var(--c-away)"></i>${an} ${pct(sa.away)}</span>`;
+  const d = sa.home - sb.home;
+  const changed = Math.abs(r.adj.lam - r.base.lam) > 1e-9 || Math.abs(r.adj.mu - r.base.mu) > 1e-9;
+  $("adj-summary").innerHTML = changed
+    ? `Ayarların ${hn} galibiyet olasılığını <span class="${d >= 0 ? "delta-up" : "delta-down"}">${d >= 0 ? "+" : ""}${(100 * d).toFixed(1)} puan</span> değiştirdi (beklenen gol ${r.base.lam.toFixed(2)}–${r.base.mu.toFixed(2)} → ${r.adj.lam.toFixed(2)}–${r.adj.mu.toFixed(2)}).`
+    : "Henüz ayar yok: iki satır aynı.";
+  const colorOf = (x, y) => x > y ? "var(--c-home)" : x === y ? "var(--c-draw)" : "var(--c-away)";
+  $("tops").innerHTML = sa.top.map(([x, y, p]) =>
+    `<tr><td><span class="dot" style="background:${colorOf(x, y)}"></span>${x}–${y}</td><td>${pct(p)}</td></tr>`).join("");
+  $("markets").innerHTML = [
+    ["2.5 üst", sa.over], ["2.5 alt", 1 - sa.over], ["Karşılıklı gol", sa.btts], ["Karşılıklı gol yok", 1 - sa.btts]
+  ].map(([k, v]) => `<div class="mk"><b>${pct(v)}</b><span>${k}</span></div>`).join("");
+  const N = 6, max = Math.max(...r.ma.slice(0, N).flatMap(row => row.slice(0, N)));
+  let h = `<thead><tr><th></th>${[...Array(N).keys()].map(y => `<th scope="col">${y}</th>`).join("")}</tr></thead><tbody>`;
+  for (let x = 0; x < N; x++) {
+    h += `<tr><th scope="row">${x}</th>` + r.ma[x].slice(0, N).map(p =>
+      `<td style="background:${heatColor(p, max)}">${(100 * p).toFixed(1)}</td>`).join("") + "</tr>";
+  }
+  $("heat").innerHTML = h + "</tbody>";
+  ["home-att", "home-def", "away-att", "away-def"].forEach(k => {
+    const v = +$("adj-" + k).value; $("out-" + k).textContent = (v > 0 ? "+" : "") + v + "%";
+  });
+  $("lab-home-att").textContent = `${hn} hücum`; $("lab-home-def").textContent = `${hn} yediği gol`;
+  $("lab-away-att").textContent = `${an} hücum`; $("lab-away-def").textContent = `${an} yediği gol`;
+  notes(r);
+  $("record").value = JSON.stringify(record(r, sb, sa), null, 2);
+}
+
+function notes(r) {
+  if (mode === "league") {
+    const L = leagueModel();
+    const nh = L.matches_this_season[$("home").value], na = L.matches_this_season[$("away").value];
+    $("data-note").innerHTML = `Veri ${L.data_to} tarihine kadar. Bu sezon veride: ${teamName("home")} ${nh} maç, ${teamName("away")} ${na} maç.`
+      + ([nh, na].some(n => n < 6) ? ' <span class="tag warn">az veri</span>' : "");
+    $("missing-note").textContent = L.use_values
+      ? `Eksik oyuncuların piyasa değerini gir. Model, ${L.label} verisinden öğrendiği kadro değeri etkisiyle takım gücünü düşürür.`
+      : `${L.label} modelinde kadro değeri doğrulamada fayda göstermedi, bu yüzden eksik oyuncu girişi sonucu değiştirmez. Etkisini düşünüyorsan sağdaki düzeltmeleri kullan.`;
+    $("model-note").textContent = `${L.label} modeli: Dixon-Coles, ${L.n_matches} maç, iç saha avantajı ×${Math.exp(L.home).toFixed(2)} gol, ρ = ${L.rho.toFixed(3)}.`
+      + (L.use_values ? " İsabetli şut ve kadro değeri önseli kullanıyor." : " İsabetli şut kullanıyor.");
+  } else {
+    const W = DATA.world, th = W.teams[$("home").value], ta = W.teams[$("away").value];
+    $("data-note").innerHTML = `Veri ${W.data_to} tarihine kadar. Veride: ${th.name} ${th.n} maç, ${ta.name} ${ta.n} maç.`
+      + ([th.n, ta.n].some(n => n < 40) ? ' <span class="tag warn">az veri</span>' : "");
+    $("missing-note").textContent = "Ligler arası modelde kadro değeri doğrulamada fayda göstermedi; eksik oyuncu girişi sonucu değiştirmez. Etkisini düşünüyorsan sağdaki düzeltmeleri kullan.";
+    $("model-note").textContent = `Ligler arası model: 31 lig ve UEFA kupaları, ${W.n_matches} maç. Ligleri birbirine Avrupa maçları bağlar; Avrupa maçı yapmamış liglerin seviyesi belirsizdir.`;
+  }
+}
+
+function record(r, sb, sa) {
+  const round = v => Math.round(v * 10000) / 10000;
+  return {
+    written_at: new Date().toISOString(), model: mode === "league" ? leagueModel().label : "cross-league",
+    home: teamName("home"), away: teamName("away"), neutral: $("neutral").checked,
+    venue: mode === "world" ? $("venue").value : undefined,
+    missing_players: { home: missing.home, away: missing.away },
+    squad_value_m: { home: parseFloat($("home-squad").value) || null, away: parseFloat($("away-squad").value) || null },
+    your_adjustments_pct: adjustments(),
+    notes: { referee: $("note-ref").value, coach_home: $("note-coach-home").value, coach_away: $("note-coach-away").value },
+    model_only: { exp_goals: [round(r.base.lam), round(r.base.mu)], p_home: round(sb.home), p_draw: round(sb.draw), p_away: round(sb.away) },
+    adjusted: { exp_goals: [round(r.adj.lam), round(r.adj.mu)], p_home: round(sa.home), p_draw: round(sa.draw), p_away: round(sa.away),
+      over_2_5: round(sa.over), btts: round(sa.btts), top_scores: sa.top.slice(0, 5).map(([x, y, p]) => [`${x}-${y}`, round(p)]) },
+  };
+}
+
+function setMode(m) {
+  mode = m;
+  $("tab-league").setAttribute("aria-pressed", m === "league");
+  $("tab-world").setAttribute("aria-pressed", m === "world");
+  $("league-wrap").hidden = m !== "league";
+  $("venue-wrap").hidden = m !== "world";
+  const hn = $("home").value ? teamName("home") : DATA.defaults.home;
+  const an = $("away").value ? teamName("away") : DATA.defaults.away;
+  if (m === "world") fillTeams(findWorldId(hn), findWorldId(an));
+  else fillTeams(leagueModel().teams[hn] ? hn : null, leagueModel().teams[an] ? an : null);
+  syncSquads(); render();
+}
+
+document.addEventListener("input", e => {
+  const t = e.target;
+  if (t.dataset && t.dataset.side) missing[t.dataset.side][+t.dataset.i][t.dataset.k] = t.value;
+  render();
+});
+document.addEventListener("click", e => {
+  const del = e.target.dataset && e.target.dataset.del;
+  if (del) { missing[del].splice(+e.target.dataset.i, 1); renderPlayers(del); render(); }
+});
+["home", "away"].forEach(side => $(side + "-add").addEventListener("click", () => {
+  missing[side].push({ name: "", value: "" }); renderPlayers(side);
+  const inputs = $(side + "-players").querySelectorAll('input[data-k="name"]');
+  inputs[inputs.length - 1].focus();
+}));
+$("league").addEventListener("change", () => { fillTeams(); syncSquads(); render(); });
+$("home").addEventListener("change", () => { syncSquads(); render(); });
+$("away").addEventListener("change", () => { syncSquads(); render(); });
+$("tab-league").addEventListener("click", () => setMode("league"));
+$("tab-world").addEventListener("click", () => {
+  if (!DATA.world) { $("data-note").textContent = "Bu sayfada ligler arası model verisi yok."; return; }
+  setMode("world");
+});
+$("copy").addEventListener("click", () => {
+  const text = $("record").value;
+  const done = msg => { $("copy-status").textContent = msg; };
+  const fallback = () => { $("record").hidden = false; $("record").select(); done("Metni seçtim, kopyalayabilirsin."); };
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(() => done("Kopyalandı."), fallback);
+  } else fallback();
+});
+
+fillLeagueOptions();
+$("league").value = DATA.defaults.league;
+fillTeams(DATA.defaults.home, DATA.defaults.away);
+syncSquads();
+render();
+</script>
