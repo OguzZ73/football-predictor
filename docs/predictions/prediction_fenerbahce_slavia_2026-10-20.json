@@ -1,0 +1,59 @@
+{
+  "match": "Fenerbahçe (home) vs Slavia Praha, UEFA Champions League 2026-27",
+  "kickoff": "2026-10-20 19:45 Europe/Istanbul",
+  "prediction_written_at": "2026-10-20T20:21:55+03:00",
+  "written_after_kickoff": true,
+  "result_seen_before_writing": false,
+  "data_cutoff": "2026-10-15",
+  "model": "CrossLeagueModel",
+  "params": {
+    "xi": 0.0005,
+    "l2_team": 10.0,
+    "l2_league": 0.1
+  },
+  "team_info": {
+    "Fenerbahce": {
+      "league": "TR1",
+      "matches_in_data": 254,
+      "world_rank": 73,
+      "strength": 0.766
+    },
+    "Slavia": {
+      "league": "TS1",
+      "matches_in_data": 120,
+      "world_rank": 78,
+      "strength": 0.709
+    }
+  },
+  "hierarchical": {
+    "exp_goals_Fenerbahce": 1.773,
+    "exp_goals_Slavia": 1.272,
+    "p_Fenerbahce_win": 0.4876,
+    "p_draw": 0.2411,
+    "p_Slavia_win": 0.2713,
+    "over_2_5": 0.5866,
+    "btts": 0.6015,
+    "top_scores": [
+      [
+        "1-1",
+        0.1114
+      ],
+      [
+        "2-1",
+        0.0952
+      ],
+      [
+        "1-0",
+        0.0804
+      ],
+      [
+        "2-0",
+        0.0748
+      ],
+      [
+        "1-2",
+        0.0683
+      ]
+    ]
+  }
+}
