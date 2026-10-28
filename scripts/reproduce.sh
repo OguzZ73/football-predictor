@@ -9,7 +9,9 @@ set -euo pipefail
 for L in T1 E0; do
   football-predictor download --league "$L" --source transfermarkt --seasons 2018-2026
   football-predictor download --league "$L" --seasons 2026-2027
+  football-predictor download --league "$L" --source wikipedia --seasons 2026-2027  # fresher
 done
+football-predictor download --league UEFA --source wikipedia --seasons 2026-2027
 # Bet365 odds (football-data.co.uk compiled on Kaggle) for the market comparison
 mkdir -p data/_odds
 [ -f data/_odds/Matches.csv ] || kaggle datasets download adamgbor/club-football-match-data-2000-2025 \

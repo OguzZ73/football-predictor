@@ -51,7 +51,8 @@ def cmd_download(args) -> None:
                                   force=args.force)
     except RuntimeError as exc:
         raise SystemExit(str(exc))
-    print(f"{len(paths)}/{len(seasons)} files saved under {Path(args.data_dir) / args.league}")
+    where = Path(args.data_dir) / (data_mod.UEFA_DIR if args.league == "UEFA" else args.league)
+    print(f"{len(paths)}/{len(seasons)} files saved under {where}")
 
 
 def cmd_train(args) -> None:
@@ -477,7 +478,8 @@ def build_parser() -> argparse.ArgumentParser:
                    help="openfootball: GitHub, results only (T1, E0); "
                         "football-data: football-data.co.uk, results + odds; "
                         "tff-github: TFF match lists on GitHub (T1 only); "
-                        "transfermarkt: Kaggle Transfermarkt dataset (needs a Kaggle token)")
+                        "transfermarkt: Kaggle Transfermarkt dataset (needs a Kaggle token); "
+                        "wikipedia: current season from Wikipedia (T1, E0, or --league UEFA)")
     d.add_argument("--force", action="store_true",
                    help="overwrite season files even if they hold more matches")
     d.add_argument("--league", default="T1", help=f"league code, e.g. {', '.join(data_mod.LEAGUES)}")

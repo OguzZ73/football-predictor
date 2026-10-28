@@ -76,6 +76,7 @@ Most likely scores
 | [TFF maç listeleri (GitHub)](https://github.com/betul-bostan/super-lig-match-outcome-prediction) | `--source tff-github` | Yalnızca T1, Kaggle token'ı olmayanlar için openfootball'daki 2021-23 boşluğunu doldurur. Depoda lisans belirtilmemiş: kişisel/eğitim amaçlı kullanın, veriyi yeniden dağıtmayın. |
 | [Oyuncu piyasa değerleri (Transfermarkt, Kaggle)](https://www.kaggle.com/datasets/davidcariboo/player-scores) | `kaggle datasets download davidcariboo/player-scores -f player_valuations.csv -p data/_transfermarkt --unzip` | CC0. Kadro değeri önseli için; ilk kullanımda aylık kadro değeri tablosu `data/_transfermarkt/squad_values.csv` olarak oluşturulur (2018-2026, 103 anlık görüntü). |
 | [Bahis oranları (Kaggle derlemesi)](https://www.kaggle.com/datasets/adamgbor/club-football-match-data-2000-2025) | `kaggle datasets download adamgbor/club-football-match-data-2000-2025 -f Matches.csv -p data/_odds --unzip` | football-data.co.uk'ten derlenmiş Bet365 maç öncesi oranları, 42 lig, 2000-2026. `data/_odds/Matches.csv` olarak kaydedilince oranlar maçlara tarih ve takım adı eşlemesiyle kendiliğinden bağlanır (5.809 maçta 1 skor farkı). Yalnızca ülke ligleri; UEFA kupaları yok. Lisans belirtilmemiş: kişisel/eğitim amaçlı kullanın. |
+| [Wikipedia](https://tr.wikipedia.org/wiki/2026-27_S%C3%BCper_Lig) | `--source wikipedia` (`--league T1`, `E0` veya `UEFA`) | **Devam eden sezon için en güncel ücretsiz kaynak.** Süper Lig: Türkçe Wikipedia'nın maç ve puan durumu şablonları. Premier Lig: İngilizce sonuç tablosu (tarihler openfootball fikstüründen). UEFA kupaları: lig aşaması sayfaları. Gönüllülerce düzenlendiği için her indirme mevcut veriyle karşılaştırılır; uyuşmazlık olursa yazılmaz. İsabetli şut verisi içermez (bu maçlarda model yalnızca golü kullanır). |
 | [football-data.co.uk](https://www.football-data.co.uk) | `--source football-data` | Sonuçlar **ve bahis oranları**. Geliştirme yapılan ağda erişim engelliydi (DNS bir "erişime engellenmiş" sayfasına yönleniyordu), bu yüzden README sonuçlarında kullanılmadı. Erişiminiz varsa değerlendirme tablosuna kapanış oranlarından bir **piyasa** satırı otomatik eklenir. |
 
 Kaynaklar birleştirilebilir: bir indirme, **daha fazla maç içeren** mevcut bir sezon dosyasının üzerine yazmaz (`--force` ile zorlanabilir). `scripts/reproduce.sh` önce Transfermarkt'tan 2018-26 geçmişini, sonra openfootball'dan devam eden sezonu indirir.
@@ -94,12 +95,12 @@ Kaynaklar birleştirilebilir: bir indirme, **daha fazla maç içeren** mevcut bi
 - **T1:** tek bir fark var. MKE Ankaragücü - Alanyaspor (12 Mart 2023) TFF verisinde 1-2, Transfermarkt'ta 2-0. TFF'deki maç bağlantısı artık başka bir maça gittiği için doğrulanamadı; Transfermarkt değeri kullanılıyor.
 - **openfootball'un kaçırdıkları:** 2024-25 sezonunun son haftasındaki 4 maç.
 
-**Veri kapsamı (2026-10-15 itibarıyla):**
+**Veri kapsamı (2026-10-28 itibarıyla):**
 
 | Lig | Sezonlar | Maç | Not |
 |---|---|---|---|
-| T1 Süper Lig | 2018-19 … 2025-26 eksiksiz, 2026-27* | 2.788 | 2022-23: 313 oynanmış maç (29 hükmen atıldı), 2024-25: 341 (1 hükmen atıldı). *2026-27 openfootball'dan, 36 maç (7 Eylül 2026'ya kadar). |
-| E0 Premier League | 2018-19 … 2025-26 eksiksiz, 2026-27* | 3.090 | *2026-27 openfootball'dan, 50 maç (20 Eylül 2026'ya kadar). |
+| T1 Süper Lig | 2018-19 … 2025-26 eksiksiz, 2026-27* | 2.833 | 2022-23: 313 oynanmış maç (29 hükmen atıldı), 2024-25: 341 (1 hükmen atıldı). *2026-27 Wikipedia'dan, 81 maç (9. hafta, 25 Ekim 2026'ya kadar). |
+| E0 Premier League | 2018-19 … 2025-26 eksiksiz, 2026-27* | 3.120 | *2026-27 Wikipedia'dan, 80 maç (8. hafta, 25 Ekim 2026'ya kadar). |
 
 ## Yöntem
 
@@ -440,9 +441,10 @@ football-predictor/
 │   ├── multileague.py # ligler arası hiyerarşik model (31 lig + UEFA kupaları)
 │   ├── values.py     # kadro piyasa değeri anlık görüntüleri (Transfermarkt oyuncu değerleri)
 │   ├── app.py, app_core.js, app_template.html  # tarayıcı arayüzü (build-app)
+│   ├── wikipedia.py  # devam eden sezon sonuçları (Wikipedia)
 │   ├── plots.py      # ısı haritası, kalibrasyon, sıra olasılıkları (PNG)
 │   └── cli.py        # argparse CLI
-├── tests/            # pytest (57 test)
+├── tests/            # pytest (62 test)
 ├── notebooks/01_eda_and_results.ipynb
 ├── scripts/reproduce.sh
 └── docs/img/         # README görselleri

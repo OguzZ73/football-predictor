@@ -87,14 +87,27 @@ def load_world(data_dir: Path | str = "data", since: str = "2021-07-01") -> pd.D
                         for d, h, a in zip(df["Date"], df["HomeTeam"], df["AwayTeam"])], dtype=bool)
     df = df.loc[~awarded]
     df = pd.concat([df, _openfootball_current(df, Path(data_dir))], ignore_index=True)
-    df = pd.concat([df, _manual_results(df, Path(data_dir))], ignore_index=True)
+    for extra in (_uefa_current(Path(data_dir)), load_manual_results(Path(data_dir))):
+        df = pd.concat([df, _extra_results(df, extra)], ignore_index=True)
     return df.sort_values(["Date", "home_id"], kind="stable").reset_index(drop=True)
 
 
-def _manual_results(known: pd.DataFrame, data_dir: Path) -> pd.DataFrame:
-    """Hand-entered results (``add-result``) not already present within ±3 days."""
-    from .data import TRANSFERMARKT_COMPETITIONS, load_manual
-    m = load_manual(data_dir)
+def load_manual_results(data_dir: Path) -> pd.DataFrame:
+    from .data import load_manual
+    return load_manual(data_dir)
+
+
+def _uefa_current(data_dir: Path) -> pd.DataFrame:
+    """Current-season UEFA results written by ``download --source wikipedia --league UEFA``."""
+    from .data import UEFA_DIR
+    frames = [pd.read_csv(p, parse_dates=["Date"]) for p in sorted((data_dir / UEFA_DIR).glob("*.csv"))]
+    return pd.concat(frames, ignore_index=True) if frames else pd.DataFrame(
+        columns=["Date", "competition", "HomeTeam", "AwayTeam", "FTHG", "FTAG"])
+
+
+def _extra_results(known: pd.DataFrame, m: pd.DataFrame) -> pd.DataFrame:
+    """Extra results (hand-entered or Wikipedia) not already present within ±3 days."""
+    from .data import TRANSFERMARKT_COMPETITIONS
     if m.empty:
         return known.iloc[:0]
     comp = m["competition"].map(lambda c: TRANSFERMARKT_COMPETITIONS.get(c, c))

@@ -39,7 +39,8 @@ OPENFOOTBALL_PATHS = {
 # (no license stated: fine for personal/educational use, do not redistribute).
 TFF_GITHUB_URL = ("https://raw.githubusercontent.com/betul-bostan/super-lig-match-outcome-prediction/"
                   "main/{y1}_{y2}_sezon_maclari.csv")
-SOURCES = ("openfootball", "football-data", "tff-github", "transfermarkt")
+SOURCES = ("openfootball", "football-data", "tff-github", "transfermarkt", "wikipedia")
+UEFA_DIR = Path("_uefa")  # current-season UEFA results (wikipedia source, --league UEFA)
 
 # Kaggle "Football Data from Transfermarkt" (CC0, updated regularly).
 TRANSFERMARKT_DATASET = "davidcariboo/player-scores"
@@ -193,6 +194,8 @@ def download(league: str, seasons: list[str], data_dir: Path | str = "data",
     """
     if source == "transfermarkt":
         return download_transfermarkt(league, seasons, data_dir, force=force)
+    if source == "wikipedia":
+        return download_wikipedia(league, seasons, data_dir, force=force)
     out_dir = Path(data_dir) / league
     out_dir.mkdir(parents=True, exist_ok=True)
     written = []
@@ -235,6 +238,45 @@ def download(league: str, seasons: list[str], data_dir: Path | str = "data",
                 continue
         print(f"  {url} -> {path} ({len(content) / 1024:.0f} KB{note})")
         written.append(path)
+    return written
+
+
+def download_wikipedia(league: str, seasons: list[str], data_dir: Path | str = "data",
+                       force: bool = False) -> list[Path]:
+    """Current-season results from Wikipedia (T1, E0, or UEFA for the cup league phases)."""
+    from . import wikipedia as wp
+    data_dir = Path(data_dir)
+    written = []
+    for season in seasons:
+        try:
+            if league == "UEFA":
+                from .multileague import load_world
+                world = load_world(data_dir)
+                known = sorted(set(world["HomeTeam"]) | set(world["AwayTeam"]))
+                df, new = wp.download_uefa(season, known)
+                if new:
+                    print(f"  ! not in the data, added as new clubs: {', '.join(new)}")
+                path = data_dir / UEFA_DIR / f"{season}.csv"
+                path.parent.mkdir(parents=True, exist_ok=True)
+                cols = ["Date", "competition", "HomeTeam", "AwayTeam", "FTHG", "FTAG"]
+                df[cols].assign(Date=df["Date"].dt.strftime("%Y-%m-%d")).to_csv(path, index=False)
+                print(f"  wikipedia UEFA {season} -> {path} ({len(df)} matches, "
+                      f"{', '.join(f'{k} {v}' for k, v in df['competition'].value_counts().items())})")
+                written.append(path)
+                continue
+            df = wp.download_league(league, season, data_dir)
+        except Exception as exc:  # noqa: BLE001 - report and continue with other seasons
+            print(f"  ! wikipedia {league} {season}: {exc}")
+            continue
+        if df.empty:
+            print(f"  ! wikipedia {league} {season}: no played matches found")
+            continue
+        path = data_dir / league / f"{season}.csv"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        if _save_season(path, df[REQUIRED_COLUMNS], force):
+            print(f"  wikipedia {league} {season} -> {path} ({len(df)} played matches, "
+                  f"last {df['Date'].max():%Y-%m-%d})")
+            written.append(path)
     return written
 
 
