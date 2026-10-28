@@ -21,6 +21,7 @@
   --accent: #5cc493; --accent-soft: #1b2e24;
   --c-home: #2bb585; --c-draw: #e57a48; --c-away: #5b97e6; color-scheme: dark; }
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }
 body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.5 var(--body);
   padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
 .wrap { max-width: 1180px; margin: 0 auto; padding-block: 24px 48px; display: grid; gap: 20px; }
@@ -54,8 +55,9 @@ select:focus-visible, input:focus-visible, button:focus-visible { outline: 2px s
 .slider input { width: 100%; accent-color: var(--accent); grid-column: 1 / -1; }
 .slider output { font: 500 .9rem var(--mono); text-align: right; font-variant-numeric: tabular-nums; }
 .scoreboard { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: 12px; text-align: center; }
-.sb-team { font: 700 clamp(1.3rem, 3vw, 1.9rem)/1.05 var(--display); text-transform: uppercase; letter-spacing: .02em; overflow-wrap: anywhere; }
-.sb-xg { font: 500 clamp(1.8rem, 5vw, 2.8rem)/1 var(--mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.sb-team { font: 700 clamp(1.15rem, 2.4vw, 1.7rem)/1.05 var(--display); text-transform: uppercase; letter-spacing: .02em; overflow-wrap: break-word; }
+.sb-xg { font: 500 clamp(1.6rem, 3.6vw, 2.5rem)/1 var(--mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+@media (max-width: 520px) { .scoreboard { grid-template-columns: minmax(0, 1fr); } }
 .sb-cap { font-size: .78rem; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; }
 .bars { display: grid; gap: 10px; }
 .bar-row { display: grid; grid-template-columns: 112px minmax(0, 1fr); gap: 10px; align-items: center; }

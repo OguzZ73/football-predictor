@@ -91,14 +91,22 @@ def _world_block(data_dir: Path) -> dict | None:
     }
 
 
-def build_app_data(data_dir: Path | str = "data", models_dir: Path | str = "models") -> dict:
-    """Everything the page needs, as plain JSON-serialisable values."""
+def build_app_data(data_dir: Path | str = "data", models_dir: Path | str = "models",
+                   defaults: dict | None = None) -> dict:
+    """Everything the page needs, as plain JSON-serialisable values.
+
+    ``defaults`` ({"league", "home", "away"}) picks the match the page opens with.
+    """
     data_dir, models_dir = Path(data_dir), Path(models_dir)
     leagues = {lg: b for lg in ("T1", "E0") if (b := _league_block(lg, data_dir, models_dir))}
     if not leagues:
         raise FileNotFoundError("No trained models. Run: football-predictor train --league T1")
+    d = {"league": "T1", "home": "Galatasaray", "away": "Fenerbahçe", **(defaults or {})}
+    lg = leagues.get(d["league"])
+    if lg is None or d["home"] not in lg["current"] or d["away"] not in lg["current"]:
+        raise ValueError(f"Default match {d} is not a current-season fixture of the models")
     return {"built": str(date.today()), "leagues": leagues, "world": _world_block(data_dir),
-            "defaults": {"league": "T1", "home": "Çorum", "away": "Çaykur Rizespor"}}
+            "defaults": d}
 
 
 def render_app(app_data: dict, standalone: bool = True) -> str:
@@ -116,8 +124,9 @@ def render_app(app_data: dict, standalone: bool = True) -> str:
 
 
 def write_app(out: Path | str, data_dir: Path | str = "data", models_dir: Path | str = "models",
-              standalone: bool = True) -> Path:
+              standalone: bool = True, defaults: dict | None = None) -> Path:
     out = Path(out)
     out.parent.mkdir(parents=True, exist_ok=True)
-    out.write_text(render_app(build_app_data(data_dir, models_dir), standalone), encoding="utf-8")
+    page = render_app(build_app_data(data_dir, models_dir, defaults), standalone)
+    out.write_text(page, encoding="utf-8")
     return out

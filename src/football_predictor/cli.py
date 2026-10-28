@@ -458,8 +458,10 @@ def cmd_list_results(args) -> None:
 def cmd_build_app(args) -> None:
     from .app import write_app
     try:
-        out = write_app(args.out, args.data_dir, args.models_dir, standalone=not args.fragment)
-    except FileNotFoundError as exc:
+        defaults = {k: v for k, v in {"league": args.league, "home": args.home, "away": args.away}.items() if v}
+        out = write_app(args.out, args.data_dir, args.models_dir, standalone=not args.fragment,
+                        defaults=defaults)
+    except (FileNotFoundError, ValueError) as exc:
         raise SystemExit(str(exc))
     print(f"Wrote {out} ({out.stat().st_size / 1024:.0f} KB). Open it in a browser.")
 
@@ -536,6 +538,9 @@ def build_parser() -> argparse.ArgumentParser:
     ba.add_argument("--out", default="docs/app/index.html")
     ba.add_argument("--fragment", action="store_true",
                     help="omit <html>/<head>/<body> (for hosts that add their own skeleton)")
+    ba.add_argument("--league", default=None, help="league of the match the page opens with (T1, E0)")
+    ba.add_argument("--home", default=None, help="home team the page opens with")
+    ba.add_argument("--away", default=None, help="away team the page opens with")
     ba.set_defaults(func=cmd_build_app)
 
     sp = sub.add_parser("score-prediction", help="score a recorded prediction once the result is known")
